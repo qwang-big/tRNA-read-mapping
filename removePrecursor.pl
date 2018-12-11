@@ -26,7 +26,7 @@ while(<FILE2>){
         chomp $_;
 
 	my @id = split/\t/,$_;
-
+	next if /^@/;
 	my $start  = $id[3];
 	my $len    = length($id[9]); 
 	my @cigar = split(/(I|M|X|D)/, $id[5]);
@@ -37,7 +37,7 @@ while(<FILE2>){
 			if($cigar[$i] eq "D"){ $D += $cigar[$i-1];}
 		}
 	my $end    = $start + $len -1 + $D - $I;
-
+	$id[2] = substr($id[2],0,-3);
 	if($start > 50 && $end <= $tRNA{$id[2]}-46){
 		$read{$id[0]} = 0;
 	}	

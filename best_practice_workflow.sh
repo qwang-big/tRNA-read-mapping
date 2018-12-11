@@ -125,7 +125,7 @@ for n in $(ls ${ngsDir}/*trimmed.fastq.gz)
 do
     bn=$(basename $n _trimmed.fastq.gz)
 
-    $segemehl --silent --evalue 500 --differences 3 --maxinterval 1000 --accuracy 80 --index ${genomeDir}/${genomeName}_artificial.idx --database ${genomeDir}/${genomeName}_artificial.fa --nomatchfilename ${bn}_unmatched.fastq --query $n -o ${bn}.sam
+    $segemehl --evalue 500 --differences 3 --maxinterval 1000 --accuracy 80 --index ${genomeDir}/${genomeName}_artificial.idx --database ${genomeDir}/${genomeName}_artificial.fa --nomatchfilename ${bn}_unmatched.fastq --query $n -o ${bn}.sam
     gzip ${bn}_unmatched.fastq
 
     ##remove all reads mapping at least once to the genome
@@ -146,7 +146,7 @@ do
     bn=$(basename $n _filtered.fastq.gz)
 
     #post-mapping against cluster
-    $segemehl --silent --evalue 500 --differences 3 --maxinterval 1000 --accuracy 85 --index ${genomeDir}/${tRNAName}_cluster.idx --database ${genomeDir}/${tRNAName}_cluster.fa --nomatchfilename ${bn}_unmatched.fastq --query $n | $samtools view -bS | $samtools sort -T ${bn} -o ${bn}.bam
+    $segemehl --evalue 500 --differences 3 --maxinterval 1000 --accuracy 85 --index ${genomeDir}/${tRNAName}_cluster.idx --database ${genomeDir}/${tRNAName}_cluster.fa --nomatchfilename ${bn}_unmatched.fastq --query $n | $samtools view -bS | $samtools sort -T ${bn} -o ${bn}.bam
     gzip ${bn}_unmatched.fastq
 
     ##preparing bam file for indel realignment
@@ -163,7 +163,7 @@ do
 
     #modify mapping quality to 60 (otherwise all were removed)
     $gatk -T PrintReads -R ${genomeDir}/${tRNAName}_cluster.fa -I ${bn}.mod.bam -o ${bn}.temp.bam -rf ReassignMappingQuality -DMQ 60
-    mv -f ${bn}.temp.bam ${bn}.mod.bam
+    $samtools view -bF 4 ${bn}.temp.bam > ${bn}.mod.bam
     rm -f ${bn}.mod.bai ${bn}.mod.bam.bai
 
     #indexing
